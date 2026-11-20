@@ -1,0 +1,76 @@
+syntax = "proto3";
+
+// Hợp đồng gRPC giữa Order Service (client) và Inventory Service (server).
+// File này dùng chung cho cả hai service, được tham chiếu trực tiếp trong .csproj.
+option csharp_namespace = "InventorySystem.Contracts.Inventory";
+
+package inventory.v1;
+
+service InventoryGrpc {
+  // Lấy danh sách sản phẩm và số lượng tồn hiện tại (phục vụ GET /products).
+  rpc GetProducts (GetProductsRequest) returns (GetProductsReply);
+
+  // Kiểm tra tồn kho cho các dòng hàng của một đơn, không thay đổi dữ liệu.
+  rpc CheckStock (CheckStockRequest) returns (CheckStockReply);
+
+  // Giữ (trừ) tồn kho cho một đơn hàng. Gọi lại với cùng order_id không trừ lần hai.
+  rpc ReserveStock (ReserveStockRequest) returns (ReserveStockReply);
+
+  // Hoàn trả số lượng đã giữ khi đơn bị huỷ hoặc xử lý thất bại.
+  rpc ReleaseStock (ReleaseStockRequest) returns (ReleaseStockReply);
+}
+
+message Product {
+  string id = 1;
+  string sku = 2;
+  string name = 3;
+  int32 available_quantity = 4;
+  int32 reserved_quantity = 5;
+}
+
+message OrderLine {
+  string product_id = 1;
+  int32 quantity = 2;
+}
+
+message StockShortage {
+  string product_id = 1;
+  int32 requested = 2;
+  int32 available = 3;
+}
+
+message GetProductsRequest {}
+
+message GetProductsReply {
+  repeated Product products = 1;
+}
+
+message CheckStockRequest {
+  repeated OrderLine items = 1;
+}
+
+message CheckStockReply {
+  bool is_available = 1;
+  repeated StockShortage shortages = 2;
+}
+
+message ReserveStockRequest {
+  string order_id = 1;
+  repeated OrderLine items = 2;
+}
+
+message ReserveStockReply {
+  bool success = 1;
+  string reservation_id = 2;
+  repeated StockShortage shortages = 3;
+  string message = 4;
+}
+
+message ReleaseStockRequest {
+  string order_id = 1;
+}
+
+message ReleaseStockReply {
+  bool success = 1;
+  string message = 2;
+}
