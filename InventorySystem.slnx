@@ -1,0 +1,10 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/InventoryService/InventoryService.csproj" />
+    <Project Path="src/OrderService/OrderService.csproj" />
+    <Project Path="src/Client/Client.csproj" />
+  </Folder>
+  <Folder Name="/protos/">
+    <File Path="protos/inventory.proto" />
+  </Folder>
+</Solution>
